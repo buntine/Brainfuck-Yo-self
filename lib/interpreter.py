@@ -7,6 +7,7 @@ class BrainFuck:
     def __init__(self, filepath, array_size=30000):
         self.filepath = filepath
         self.data_pointer = 0
+        self.instruction_pointer = 0
         self.cells = [0] * array_size
 
     def interpret(self):
@@ -19,8 +20,10 @@ class BrainFuck:
         byte = stream.read(1)
         while byte:
             method = self.__fetch_handler(byte)
-            if method: method()
+            if method: method(stream)
 
+            self.instruction_pointer += 1
+            stream.seek(self.instruction_pointer)
             byte = stream.read(1)
 
         self.__close_stream(stream)
@@ -54,35 +57,37 @@ class BrainFuck:
 
         return handlers.get(command)
 
-    def __increment_pointer(self):
+    def __increment_pointer(self, *rest):
         '''Increment the data pointer (one cell to the right).'''
         if self.data_pointer < len(self.cells):
             self.data_pointer += 1
 
-    def __decrement_pointer(self):
+    def __decrement_pointer(self, *rest):
         '''Decrement the data pointer (one cell to the left).'''
         if self.data_pointer > 0:
             self.data_pointer -= 1
 
-    def __increment_data(self):
+    def __increment_data(self, *rest):
         '''Increment the value (by one) of the cell at the data pointer.'''
         self.cells[self.data_pointer] += 1
 
-    def __decrement_data(self):
+    def __decrement_data(self, *rest):
         '''Decrement the value (by one) of the cell at the data pointer.'''
         self.cells[self.data_pointer] -= 1
 
-    def __write_data(self):
+    def __write_data(self, *rest):
         '''Outputs the value of the cell at the data pointer.'''
-        print chr(self.cells[self.data_pointer]),
+        sys.stdout.write(chr(self.cells[self.data_pointer]))
 
-    def __read_data(self):
-        '''Reads a value STDIN and stores it at the data pointer.'''
+    def __read_data(self, *rest):
+        '''Reads a value from STDIN and stores it at the data pointer.'''
         data = raw_input()
         self.cells[self.data_pointer] = data
 
-    def __future_jump(self):
-        print "[",
+    def __future_jump(self, stream):
+        if self.cells[self.data_pointer] == 0:
+            self.instruction_pointer = 41
 
-    def __history_jump(self):
-        print "]"
+    def __history_jump(self, stream):
+        if self.cells[self.data_pointer] > 0:
+            self.instruction_pointer = 10
