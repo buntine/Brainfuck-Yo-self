@@ -85,9 +85,35 @@ class BrainFuck:
         self.cells[self.data_pointer] = data
 
     def __future_jump(self, stream):
+        '''If the value at the data pointer is zero, jump it forward to
+           the command after the matching ] command.'''
         if self.cells[self.data_pointer] == 0:
-            self.instruction_pointer = 41
+            position = stream.tell()
+            byte = stream.read(1)
+
+            while byte and byte != "]":
+                byte = stream.read(1)
+
+            if byte:
+                self.instruction_pointer = stream.tell()
+                stream.seek(position)
+            else:
+                raise SyntaxError("No closing brace was found for command at position %d" % position)
 
     def __history_jump(self, stream):
+        '''If the byte at the data pointer is nonzero, jump it back to
+           the command after the matching [ command.'''
         if self.cells[self.data_pointer] > 0:
-            self.instruction_pointer = 10
+            position = stream.tell()
+            byte = stream.read(1)
+
+            while stream.tell() > 0 and byte != "[":
+                byte = stream.read(1)
+                stream.seek(-2, 1)
+
+            if byte == "[":
+                self.instruction_pointer = stream.tell()
+                stream.seek(position)
+            else:
+                raise SyntaxError("No opening brace was found for command at position %d" % position)
+
