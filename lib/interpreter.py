@@ -55,25 +55,34 @@ class BrainFuck:
         return handlers.get(command)
 
     def __increment_pointer(self):
-        print ">"
+        '''Increment the data pointer (one cell to the right).'''
+        if self.data_pointer < len(self.cells):
+            self.data_pointer += 1
 
     def __decrement_pointer(self):
-        print "<"
+        '''Decrement the data pointer (one cell to the left).'''
+        if self.data_pointer > 0:
+            self.data_pointer -= 1
 
     def __increment_data(self):
-        print "+"
+        '''Increment the value (by one) of the cell at the data pointer.'''
+        self.cells[self.data_pointer] += 1
 
     def __decrement_data(self):
-        print "-"
+        '''Decrement the value (by one) of the cell at the data pointer.'''
+        self.cells[self.data_pointer] -= 1
 
     def __write_data(self):
-        print "."
+        '''Outputs the value of the cell at the data pointer.'''
+        print chr(self.cells[self.data_pointer]),
 
     def __read_data(self):
-        print ","
+        '''Reads a value STDIN and stores it at the data pointer.'''
+        data = raw_input()
+        self.cells[self.data_pointer] = data
 
     def __future_jump(self):
-        print "["
+        print "[",
 
     def __history_jump(self):
         print "]"
