@@ -4,6 +4,17 @@ class BrainFuck:
     '''A simple interpreter for the Brainfuck esotoric programming
      language. Originally designed by Urban Muller in 1993.'''
 
+    HANDLERS = {
+        '>': 'increment_pointer',
+        '<': 'decrement_pointer',
+        '+': 'increment_data',
+        '-': 'decrement_data',
+        '.': 'write_data',
+        ',': 'read_data',
+        '[': 'future_jump',
+        ']': 'history_jump'
+    }
+
     def __init__(self, filepath, array_size=30000):
         self.filepath = filepath
         self.cells = self.__init_cells(array_size)
@@ -16,7 +27,10 @@ class BrainFuck:
 
         stream = self.__open_stream()
 
-        print "Fuck!"
+        byte = stream.read(1)
+        while byte:
+            print byte
+            byte = stream.read(1)
 
         self.__close_stream(stream)
 
