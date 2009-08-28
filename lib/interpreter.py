@@ -6,7 +6,7 @@ class BrainFuck:
        language. Originally designed by Urban Muller in 1993.'''
 
     def __init__(self, filepath, array_size=30000):
-        self.filepath = filepath
+        self.stream = self.__open_stream(filepath)
         self.data_pointer = 0
         self.instruction_pointer = 0
         self.cells = [0] * array_size
@@ -16,26 +16,24 @@ class BrainFuck:
            it as a Brainfuck program. Output is pushed directly to STDOUT,
            so this method will either return None, or raise an exception.'''
 
-        file = self.__open_stream()
-
-        with file as stream:
-            byte = stream.read(1)
+        with self.stream as s:
+            byte = s.read(1)
             while byte:
                 method = self.__fetch_handler(byte)
-                if method: method(stream)
+                if method: method()
 
                 # Seek to the instruction pointer explicitely, as the 
                 # command may have updated it.
                 self.instruction_pointer += 1
-                stream.seek(self.instruction_pointer, 0)
-                byte = stream.read(1)
+                s.seek(self.instruction_pointer, 0)
+                byte = s.read(1)
 
-    def __open_stream(self):
+    def __open_stream(self, filepath):
         '''Opens a file for reading and returns it.'''
         try:
-            file = open(self.filepath, "r", 0)
+            file = open(filepath, "r", 0)
         except IOError:
-            raise IOError("File '%s' cannot be read. Are you sure it exists?" % self.filepath)
+            raise IOError("File '%s' cannot be read. Are you sure it exists?" % filepath)
 
         return file
 
@@ -55,29 +53,29 @@ class BrainFuck:
 
         return handlers.get(command)
 
-    def __increment_pointer(self, *rest):
+    def __increment_pointer(self):
         '''Increment the data pointer (one cell to the right).'''
         if self.data_pointer < len(self.cells):
             self.data_pointer += 1
 
-    def __decrement_pointer(self, *rest):
+    def __decrement_pointer(self):
         '''Decrement the data pointer (one cell to the left).'''
         if self.data_pointer > 0:
             self.data_pointer -= 1
 
-    def __increment_data(self, *rest):
+    def __increment_data(self):
         '''Increment the value (by one) of the cell at the data pointer.'''
         self.cells[self.data_pointer] += 1
 
-    def __decrement_data(self, *rest):
+    def __decrement_data(self):
         '''Decrement the value (by one) of the cell at the data pointer.'''
         self.cells[self.data_pointer] -= 1
 
-    def __write_data(self, *rest):
+    def __write_data(self):
         '''Outputs the value of the cell at the data pointer.'''
         sys.stdout.write(chr(self.cells[self.data_pointer]))
 
-    def __read_data(self, *rest):
+    def __read_data(self):
         '''Reads a value from STDIN and stores it at the data pointer.'''
         try:
             data = ord(raw_input()[0])
@@ -85,12 +83,12 @@ class BrainFuck:
             raise ValueError("WTF did you type?!")
         self.cells[self.data_pointer] = data
 
-    def __future_jump(self, stream):
+    def __future_jump(self):
         '''If the value at the data pointer is zero, jump it forward to
            the command after the matching ] command.'''
         if self.cells[self.data_pointer] == 0:
-            position = stream.tell()
-            byte = stream.read(1)
+            position = self.stream.tell()
+            byte = self.stream.read(1)
             nest_count = 0
 
             # Contine reading the file until we find the matching
@@ -105,24 +103,24 @@ class BrainFuck:
                     else:
                         nest_count -= 1
 
-                byte = stream.read(1)
+                byte = self.stream.read(1)
             else:
                 raise SyntaxError("No closing brace was found for command at position %d" % position)
 
-            self.instruction_pointer = stream.tell()
+            self.instruction_pointer = self.stream.tell()
 
-    def __history_jump(self, stream):
+    def __history_jump(self):
         '''If the byte at the data pointer is nonzero, jump it back to
            the command after the matching [ command.'''
         if self.cells[self.data_pointer] != 0:
-            position = stream.tell()
+            position = self.stream.tell()
             nest_count = 0
 
             # Contine reading the file backwards until we find the
             # matching command, or just die with syntax error.
-            while stream.tell() > 0:
-                stream.seek(-2, 1)
-                byte = stream.read(1)
+            while self.stream.tell() > 0:
+                self.stream.seek(-2, 1)
+                byte = self.stream.read(1)
                 if byte == "]":
                     nest_count += 1
                 elif byte == "[":
@@ -133,4 +131,4 @@ class BrainFuck:
             else:
                 raise SyntaxError("No opening brace was found for command at position %d" % position)
 
-            self.instruction_pointer = stream.tell() - 1
+            self.instruction_pointer = self.stream.tell() - 1
