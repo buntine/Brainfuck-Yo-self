@@ -108,7 +108,6 @@ class BrainFuck:
 
             if byte == "]":
                 self.instruction_pointer = stream.tell()
-                stream.seek(position)
             else:
                 raise SyntaxError("No closing brace was found for command at position %d" % position)
 
@@ -132,6 +131,5 @@ class BrainFuck:
 
             if byte == "[":
                 self.instruction_pointer = stream.tell() - 1
-                stream.seek(position)
             else:
                 raise SyntaxError("No opening brace was found for command at position %d" % position)
