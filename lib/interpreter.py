@@ -95,6 +95,7 @@ class BrainFuck:
 
             # Contine reading the file until we find the matching
             # command, or just die with syntax error.
+            # TODO: Cleanup! Recursion could soooo work here.
             while byte:
                 if byte == "[":
                     nest_count += 1
@@ -105,11 +106,10 @@ class BrainFuck:
                         nest_count -= 1
 
                 byte = stream.read(1)
-
-            if byte == "]":
-                self.instruction_pointer = stream.tell()
             else:
                 raise SyntaxError("No closing brace was found for command at position %d" % position)
+
+            self.instruction_pointer = stream.tell()
 
     def __history_jump(self, stream):
         '''If the byte at the data pointer is nonzero, jump it back to
@@ -130,8 +130,7 @@ class BrainFuck:
                          break
                     else:
                          nest_count -= 1
-
-            if byte == "[":
-                self.instruction_pointer = stream.tell() - 1
             else:
                 raise SyntaxError("No opening brace was found for command at position %d" % position)
+
+            self.instruction_pointer = stream.tell() - 1
