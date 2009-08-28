@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import sys
 
 class BrainFuck:
@@ -15,18 +16,17 @@ class BrainFuck:
            it as a Brainfuck program. Output is pushed directly to STDOUT,
            so this method will either return None, or raise an exception.'''
 
-        stream = self.__open_stream()
+        file = self.__open_stream()
 
-        byte = stream.read(1)
-        while byte:
-            method = self.__fetch_handler(byte)
-            if method: method(stream)
-
-            self.instruction_pointer += 1
-            stream.seek(self.instruction_pointer, 0)
+        with file as stream:
             byte = stream.read(1)
+            while byte:
+                method = self.__fetch_handler(byte)
+                if method: method(stream)
 
-        self.__close_stream(stream)
+                self.instruction_pointer += 1
+                stream.seek(self.instruction_pointer, 0)
+                byte = stream.read(1)
 
     def __open_stream(self):
         '''Opens a file for reading and returns it.'''
@@ -36,10 +36,6 @@ class BrainFuck:
             raise IOError("File '%s' cannot be read. Are you sure it exists?" % self.filepath)
 
         return file
-
-    def __close_stream(self, file):
-        file.close()
-        return file.closed
 
     def __fetch_handler(self, command):
         '''Maps program commands to appropriate handler methods. Returns

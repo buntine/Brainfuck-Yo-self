@@ -2,5 +2,5 @@
 
 from lib.interpreter import BrainFuck
 
-bf = BrainFuck("./examples/hello_world.bf")
+bf = BrainFuck("./examples/addition.bf")
 bf.interpret()
