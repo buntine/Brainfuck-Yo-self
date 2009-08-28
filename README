@@ -1,1 +1,17 @@
-Brainfuckorrr!
+*************************************
+******    BRAINFUCK YO'SELF    ******
+*************************************
+
+By Andrew Buntine (http://www.andrewbuntine.com).
+Copyright 2009.
+
+This software is distributed under the WGAF (Who gives a fuck?) Licence revision 1.
+You are free to use, redistribute, customise, lie, steal, cheat, kill and mame. No raping, please.
+
+*************************************
+
+This is a very basic interpreter for the Brainfuck programming language. There is no solid standard
+for this esoteric language, so it's really just my own dialect. I have provided a few example programs
+in this repository.
+
+Read about Brainfuck and similar topics here: http://esolangs.org/wiki/Brainfuck. And here: http://en.wikipedia.org/wiki/Brainfuck
