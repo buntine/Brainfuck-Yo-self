@@ -82,9 +82,9 @@ class BrainFuck:
     def __read_data(self, *rest):
         '''Reads a value from STDIN and stores it at the data pointer.'''
         try:
-            data = int(raw_input())
+            data = ord(raw_input()[0])
         except:
-            data = 0
+            raise ValueError("WTF did you type?!")
         self.cells[self.data_pointer] = data
 
     def __future_jump(self, stream):
@@ -93,8 +93,17 @@ class BrainFuck:
         if self.cells[self.data_pointer] == 0:
             position = stream.tell()
             byte = stream.read(1)
+            nest_count = 0
 
-            while byte and byte != "]":
+            while byte:
+                if byte == "[":
+                    nest_count += 1
+                elif byte == "]":
+                    if nest_count == 0:
+                        break
+                    else:
+                        nest_count -= 1
+
                 byte = stream.read(1)
 
             if byte == "]":
@@ -108,17 +117,21 @@ class BrainFuck:
            the command after the matching [ command.'''
         if self.cells[self.data_pointer] != 0:
             position = stream.tell()
-            byte = stream.read(1)
+            nest_count = 0
 
-            while stream.tell() > 0 and byte != "[":
+            while stream.tell() > 0:
                 stream.seek(-2, 1)
                 byte = stream.read(1)
+                if byte == "]":
+                    nest_count += 1
+                elif byte == "[":
+                    if nest_count == 0:
+                         break
+                    else:
+                         nest_count -= 1
 
             if byte == "[":
                 self.instruction_pointer = stream.tell() - 1
                 stream.seek(position)
             else:
-#                self.instruction_pointer = -1
- #               stream.seek(position)
                 raise SyntaxError("No opening brace was found for command at position %d" % position)
-
