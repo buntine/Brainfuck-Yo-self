@@ -24,6 +24,8 @@ class BrainFuck:
                 method = self.__fetch_handler(byte)
                 if method: method(stream)
 
+                # Seek to the instruction pointer explicitely, as the 
+                # command may have updated it.
                 self.instruction_pointer += 1
                 stream.seek(self.instruction_pointer, 0)
                 byte = stream.read(1)
@@ -91,6 +93,8 @@ class BrainFuck:
             byte = stream.read(1)
             nest_count = 0
 
+            # Contine reading the file until we find the matching
+            # command, or just die with syntax error.
             while byte:
                 if byte == "[":
                     nest_count += 1
@@ -114,6 +118,8 @@ class BrainFuck:
             position = stream.tell()
             nest_count = 0
 
+            # Contine reading the file backwards until we find the
+            # matching command, or just die with syntax error.
             while stream.tell() > 0:
                 stream.seek(-2, 1)
                 byte = stream.read(1)
