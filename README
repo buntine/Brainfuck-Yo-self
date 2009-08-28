@@ -14,4 +14,8 @@ This is a very basic interpreter for the Brainfuck programming language. There i
 for this esoteric language, so it's really just my own dialect. I have provided a few example programs
 in this repository.
 
+I've added a little script so you can execute local brainfuck programs:
+
+  ./brainfuck.py examples/hello_world.bf
+
 Read about Brainfuck and similar topics here: http://esolangs.org/wiki/Brainfuck. And here: http://en.wikipedia.org/wiki/Brainfuck
