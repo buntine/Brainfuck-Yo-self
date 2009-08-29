@@ -2,7 +2,7 @@ from __future__ import with_statement
 import sys
 
 class BrainFuck:
-    '''A simple interpreter for the Brainfuck esotoric programming
+    '''A simple interpreter for the Brainfuck esoteric programming
        language. Originally designed by Urban Muller in 1993.'''
 
     def __init__(self, filepath, array_size=30000):
@@ -15,7 +15,6 @@ class BrainFuck:
         '''Main interpreter loop. Reads in the file and blindly interprets
            it as a Brainfuck program. Output is pushed directly to STDOUT,
            so this method will either return None, or raise an exception.'''
-
         with self.stream as s:
             byte = s.read(1)
             while byte:
@@ -93,7 +92,6 @@ class BrainFuck:
 
             # Contine reading the file until we find the matching
             # command, or just die with syntax error.
-            # TODO: Cleanup! Recursion could soooo work here.
             while byte:
                 if byte == "[":
                     nest_count += 1
@@ -118,16 +116,16 @@ class BrainFuck:
 
             # Contine reading the file backwards until we find the
             # matching command, or just die with syntax error.
-            while self.stream.tell() > 0:
+            while self.stream.tell() > 1:
                 self.stream.seek(-2, 1)
                 byte = self.stream.read(1)
                 if byte == "]":
                     nest_count += 1
                 elif byte == "[":
                     if nest_count == 0:
-                         break
+                        break
                     else:
-                         nest_count -= 1
+                        nest_count -= 1
             else:
                 raise SyntaxError("No opening brace was found for command at position %d" % position)
 
