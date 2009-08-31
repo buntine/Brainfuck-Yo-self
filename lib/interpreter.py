@@ -54,13 +54,16 @@ class BrainFuck:
 
     def __increment_pointer(self):
         '''Increment the data pointer (one cell to the right).'''
-        if self.data_pointer < len(self.cells):
-            self.data_pointer += 1
+        self.data_pointer += 1
+
+        # If we run out of space, just increase memory! This is an
+        # easy way of achieving Turing Completeness.
+        if self.data_pointer == len(self.cells):
+            self.cells.append(0)
 
     def __decrement_pointer(self):
         '''Decrement the data pointer (one cell to the left).'''
-        if self.data_pointer > 0:
-            self.data_pointer -= 1
+        self.data_pointer -= 1
 
     def __increment_data(self):
         '''Increment the value (by one) of the cell at the data pointer.'''
@@ -75,11 +78,17 @@ class BrainFuck:
         sys.stdout.write(chr(self.cells[self.data_pointer]))
 
     def __read_data(self):
-        '''Reads a value from STDIN and stores it at the data pointer.'''
+        '''Reads a value from STDIN and stores it at the data pointer. A
+           newline acts as EOF.'''
         try:
-            data = ord(raw_input()[0])
+            input = raw_input()
+            if len(input) == 0:
+                data = 0
+            else:
+                data = ord(input[0])
         except:
             raise ValueError("WTF did you type?!")
+
         self.cells[self.data_pointer] = data
 
     def __future_jump(self):
